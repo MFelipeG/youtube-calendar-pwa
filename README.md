@@ -175,3 +175,47 @@ MIT License - sinta-se livre para usar e modificar!
 ---
 
 **Desenvolvido com ❤️ para criadores de conteúdo do YouTube**
+
+---
+
+## 🔧 Correções Recentes (Janeiro 2026)
+
+### PWA Mobile Corrigido ✅
+
+**Problema anterior:** O PWA não podia ser instalado em dispositivos móveis devido a configurações incorretas no `manifest.json`.
+
+**Solução aplicada:**
+- Adicionado `start_url` correto para GitHub Pages: `/youtube-calendar-pwa/`
+- Adicionado `scope` correto: `/youtube-calendar-pwa/`
+- Atualizado service worker (`sw.js`) com paths completos para cache
+
+### Sincronização PC/Mobile ✅
+
+**Como funciona:**
+- A sincronização entre dispositivos é feita automaticamente através do Firebase Realtime Database
+- Todos os dados são salvos em tempo real e sincronizados instantaneamente
+- Funciona tanto em PC quanto em dispositivos móveis quando online
+- Fallback automático para localStorage quando offline
+
+**Para usar em múltiplos dispositivos:**
+1. Acesse o app em ambos os dispositivos: https://mfelipeg.github.io/youtube-calendar-pwa/
+2. Certifique-se de estar conectado à internet
+3. As postagens serão sincronizadas automaticamente entre os dispositivos
+
+### Como Instalar o PWA
+
+**No Mobile (Android/iOS):**
+1. Acesse: https://mfelipeg.github.io/youtube-calendar-pwa/
+2. No Chrome (Android): Toque no menu (⋮) > "Adicionar à tela inicial"
+3. No Safari (iOS): Toque no botão compartilhar > "Adicionar à Tela de Início"
+
+**No Desktop:**
+1. Acesse: https://mfelipeg.github.io/youtube-calendar-pwa/
+2. Clique no ícone de instalação na barra de endereço
+3. Ou vá em Menu > "Instalar YouTube Calendar"
+
+### Tecnologias de Sincronização
+
+- **Firebase Realtime Database** - Sincronização em tempo real entre dispositivos
+- **Service Worker** - Cache offline para funcionamento sem internet
+- **localStorage** - Backup local automático
