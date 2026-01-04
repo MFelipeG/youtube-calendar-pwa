@@ -1,13 +1,11 @@
 const CACHE_NAME = 'youtube-calendar-v1';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/styles.css',
-  '/app.js',
-  '/manifest.json',
-  '/icon-192.png',
-  '/icon-512.png'
-];
+  '/youtube-calendar-pwa/',  '/index.html',
+  '/youtube-calendar-pwa/styles.css',  '/app.js',
+  '/youtube-calendar-pwa/app.js',  '/icon-192.png',
+  '/youtube-calendar-pwa/manifest.json',];
+  '/youtube-calendar-pwa/icon-192.png',
+      '/youtube-calendar-pwa/icon-512.png'
 
 self.addEventListener('install', event => {
   event.waitUntil(
