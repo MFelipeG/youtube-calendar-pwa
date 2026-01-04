@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gerador de Ícones PWA</title>
+</head>
+<body>
+    <h1>Gerador de Ícones do YouTube Calendar PWA</h1>
+    <p>Clique nos botões para baixar os ícones:</p>
+    <button onclick="generateIcon(192)">Baixar icon-192.png</button>
+    <button onclick="generateIcon(512)">Baixar icon-512.png</button>
+    
+    <canvas id="canvas" style="display:none;"></canvas>
+    
+    <script>
+    function generateIcon(size) {
+        const canvas = document.getElementById('canvas');
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext('2d');
+        
+        // Fundo vermelho do YouTube
+        ctx.fillStyle = '#FF0000';
+        ctx.fillRect(0, 0, size, size);
+        
+        // Ícone branco do play (triângulo)
+        ctx.fillStyle = '#FFFFFF';
+        ctx.beginPath();
+        const centerX = size / 2;
+        const centerY = size / 2;
+        const triangleSize = size * 0.35;
+        ctx.moveTo(centerX - triangleSize/2, centerY - triangleSize/1.5);
+        ctx.lineTo(centerX - triangleSize/2, centerY + triangleSize/1.5);
+        ctx.lineTo(centerX + triangleSize/1.2, centerY);
+        ctx.closePath();
+        ctx.fill();
+        
+        // Texto YT Calendar
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = `bold ${size * 0.12}px Arial`;
+        ctx.textAlign = 'center';
+        ctx.fillText('YT Calendar', centerX, size * 0.85);
+        
+        // Download
+        canvas.toBlob(function(blob) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `icon-${size}.png`;
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+    }
+    </script>
+</body>
+</html>
