@@ -109,6 +109,27 @@
         </div>
     </div>
 
+    <!-- Firebase SDKs (compat) -->
+    <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-database-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDlZvK48n1EHQr430P5qtfYlvqPEVjTYts",
+            authDomain: "calendar-pwa-7742d.firebaseapp.com",
+            databaseURL: "https://calendar-pwa-7742d-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "calendar-pwa-7742d",
+            storageBucket: "calendar-pwa-7742d.firebasestorage.app",
+            messagingSenderId: "843179718282",
+            appId: "1:843179718282:web:28541290f2df173b1adf73",
+            measurementId: "G-0VJZ2EW88T"
+        };
+
+        // Inicializa Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+    </script>
+
     <script src="app.js"></script>
     <script>
         if ('serviceWorker' in navigator) {
