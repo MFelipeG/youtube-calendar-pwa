@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Gerenciador de calendário de postagens YouTube">
+    <meta name="theme-color" content="#FF0000">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="icon-192.png">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <title>YouTube Calendar - Postagens</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1>
+                    <svg class="youtube-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                    </svg>
+                    YouTube Calendar
+                </h1>
+                <button id="addPostBtn" class="btn-primary">
+                    <span>+</span> Nova Postagem
+                </button>
+            </div>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="totalPosts">0</div>
+                <div class="stat-label">Total de Postagens</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="thisMonth">0</div>
+                <div class="stat-label">Este Mês</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="upcoming">0</div>
+                <div class="stat-label">Próximas 7 Dias</div>
+            </div>
+        </div>
+
+        <div class="calendar-header">
+            <button id="prevMonth" class="month-nav">‹</button>
+            <h2 id="currentMonth"></h2>
+            <button id="nextMonth" class="month-nav">›</button>
+        </div>
+
+        <div class="calendar" id="calendar"></div>
+
+        <div class="posts-section">
+            <h3>Próximas Postagens</h3>
+            <div id="upcomingPosts" class="posts-list"></div>
+        </div>
+
+        <div class="posts-section">
+            <h3>Postagens Realizadas</h3>
+            <div id="completedPosts" class="posts-list"></div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Nova Postagem</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <form id="postForm">
+                <div class="form-group">
+                    <label for="videoTitle">Título do Vídeo</label>
+                    <input type="text" id="videoTitle" required>
+                </div>
+                <div class="form-group">
+                    <label for="postDate">Data da Postagem</label>
+                    <input type="date" id="postDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="postTime">Horário</label>
+                    <input type="time" id="postTime" value="18:00" required>
+                </div>
+                <div class="form-group">
+                    <label for="videoUrl">URL do Vídeo (opcional)</label>
+                    <input type="url" id="videoUrl" placeholder="https://youtube.com/watch?v=...">
+                </div>
+                <div class="form-group">
+                    <label for="notes">Observações</label>
+                    <textarea id="notes" rows="3"></textarea>
+                </div>
+                <div class="form-group checkbox-group">
+                    <label>
+                        <input type="checkbox" id="reminderEnabled">
+                        <span>Ativar lembrete (1 dia antes)</span>
+                    </label>
+                </div>
+                <div class="form-group checkbox-group">
+                    <label>
+                        <input type="checkbox" id="isPosted">
+                        <span>Vídeo já publicado</span>
+                    </label>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary cancel-btn">Cancelar</button>
+                    <button type="submit" class="btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(reg => console.log('SW registrado', reg))
+                .catch(err => console.log('Erro SW', err));
+        }
+    </script>
+</body>
+</html>

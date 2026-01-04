@@ -1,0 +1,35 @@
+{
+  "name": "YouTube Calendar - Gerenciador de Postagens",
+  "short_name": "YT Calendar",
+  "description": "Gerenciador profissional de calendário de postagens para YouTube",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#FF0000",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "utilities"],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Nova Postagem",
+      "short_name": "Novo",
+      "description": "Adicionar nova postagem",
+      "url": "/?action=new",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
