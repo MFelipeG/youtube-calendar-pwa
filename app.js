@@ -2,10 +2,20 @@
 let currentDate = new Date();
 let posts = [];
 let editingId = null;
+let firebaseReady = false;
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
-    loadPosts();
+    // Aguardar Firebase estar pronto antes de carregar posts
+    if (typeof db !== 'undefined') {
+        firebaseReady = true;
+        setupFirebaseListener();
+    } else {
+        console.error('Firebase não foi inicializado');
+        // Fallback para localStorage
+        loadPostsLocal();
+    }
+    
     renderCalendar();
     updateStats();
     renderPosts();
@@ -30,13 +40,85 @@ function setupEventListeners() {
     });
 }
 
-// Local Storage
-function loadPosts() {
+// Firebase: Listener em tempo real
+function setupFirebaseListener() {
+    const ref = db.ref('posts');
+
+    ref.on('value', (snapshot) => {
+        const data = snapshot.val();
+        
+        if (data) {
+            // Transforma objeto em array
+            posts = Object.values(data);
+        } else {
+            posts = [];
+        }
+        
+        updateStats();
+        renderCalendar();
+        renderPosts();
+    }, (error) => {
+        console.error('Erro ao carregar posts do Firebase:', error);
+        // Fallback para localStorage
+        loadPostsLocal();
+    });
+}
+
+// Firebase: Salvar um post
+function savePost(postData) {
+    if (!firebaseReady) {
+        console.warn('Firebase não está pronto, usando localStorage');
+        savePostLocal(postData);
+        return Promise.resolve();
+    }
+
+    const ref = db.ref('posts/' + postData.id);
+    return ref.set(postData).catch(err => {
+        console.error('Erro ao salvar no Firebase:', err);
+        savePostLocal(postData);
+        throw err;
+    });
+}
+
+// Firebase: Deletar um post
+function deletePostFromFirebase(id) {
+    if (!firebaseReady) {
+        console.warn('Firebase não está pronto, usando localStorage');
+        deletePostLocal(id);
+        return Promise.resolve();
+    }
+
+    const ref = db.ref('posts/' + id);
+    return ref.remove().catch(err => {
+        console.error('Erro ao deletar no Firebase:', err);
+        deletePostLocal(id);
+        throw err;
+    });
+}
+
+// Fallback: Local Storage
+function loadPostsLocal() {
     const stored = localStorage.getItem('youtubePosts');
     posts = stored ? JSON.parse(stored) : [];
 }
 
-function savePosts() {
+function savePostLocal(postData) {
+    if (editingId) {
+        const index = posts.findIndex(p => p.id === editingId);
+        if (index !== -1) {
+            posts[index] = postData;
+        }
+    } else {
+        posts.push(postData);
+    }
+    localStorage.setItem('youtubePosts', JSON.stringify(posts));
+    updateStats();
+    renderCalendar();
+    renderPosts();
+}
+
+function deletePostLocal(id) {
+    posts = posts.filter(p => p.id !== id);
     localStorage.setItem('youtubePosts', JSON.stringify(posts));
     updateStats();
     renderCalendar();
@@ -171,17 +253,24 @@ function editPost(id) {
 
 function deletePost(id) {
     if (confirm('Tem certeza que deseja excluir esta postagem?')) {
-        posts = posts.filter(p => p.id !== id);
-        savePosts();
+        deletePostFromFirebase(id).catch(err => {
+            alert('Erro ao excluir. Tente novamente.');
+        });
     }
 }
 
 function togglePosted(id) {
     const post = posts.find(p => p.id === id);
-    if (post) {
-        post.isPosted = !post.isPosted;
-        savePosts();
-    }
+    if (!post) return;
+
+    const updated = {
+        ...post,
+        isPosted: !post.isPosted
+    };
+
+    savePost(updated).catch(err => {
+        alert('Erro ao atualizar. Tente novamente.');
+    });
 }
 
 // Form Submit
@@ -189,7 +278,7 @@ function handleSubmit(e) {
     e.preventDefault();
     
     const postData = {
-        id: editingId || Date.now(),
+        id: editingId || Date.now().toString(),
         title: document.getElementById('videoTitle').value,
         date: document.getElementById('postDate').value,
         time: document.getElementById('postTime').value,
@@ -197,22 +286,21 @@ function handleSubmit(e) {
         notes: document.getElementById('notes').value,
         reminder: document.getElementById('reminderEnabled').checked,
         isPosted: document.getElementById('isPosted').checked,
-        createdAt: editingId ? posts.find(p => p.id === editingId).createdAt : new Date().toISOString()
+        createdAt: editingId
+            ? posts.find(p => p.id === editingId).createdAt
+            : new Date().toISOString()
     };
-    
-    if (editingId) {
-        const index = posts.findIndex(p => p.id === editingId);
-        posts[index] = postData;
-    } else {
-        posts.push(postData);
-    }
-    
-    savePosts();
-    closeModal();
-    
-    if (postData.reminder && !postData.isPosted) {
-        scheduleReminder(postData);
-    }
+
+    savePost(postData)
+        .then(() => {
+            closeModal();
+            if (postData.reminder && !postData.isPosted) {
+                scheduleReminder(postData);
+            }
+        })
+        .catch(err => {
+            alert('Erro ao salvar. Tente novamente.');
+        });
 }
 
 // Render Posts
@@ -261,11 +349,11 @@ function renderPostList(containerId, postList, isCompleted) {
                     ${post.notes ? `<div class="post-meta" style="margin-top: 8px; font-style: italic;">${post.notes}</div>` : ''}
                 </div>
                 <div class="post-actions">
-                    <button class="icon-btn" onclick="togglePosted(${post.id})" title="${post.isPosted ? 'Marcar como pendente' : 'Marcar como publicado'}">
+                    <button class="icon-btn" onclick="togglePosted('${post.id}')" title="${post.isPosted ? 'Marcar como pendente' : 'Marcar como publicado'}">
                         ${post.isPosted ? '↻' : '✓'}
                     </button>
-                    <button class="icon-btn" onclick="editPost(${post.id})" title="Editar">✎</button>
-                    <button class="icon-btn delete" onclick="deletePost(${post.id})" title="Excluir">🗑</button>
+                    <button class="icon-btn" onclick="editPost('${post.id}')" title="Editar">✎</button>
+                    <button class="icon-btn delete" onclick="deletePost('${post.id}')" title="Excluir">🗑</button>
                 </div>
             </div>
         `;
