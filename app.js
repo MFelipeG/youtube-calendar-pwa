@@ -59,7 +59,6 @@ function setupFirebaseListener() {
         renderPosts();
     }, (error) => {
         console.error('Erro ao carregar posts do Firebase:', error);
-        // Fallback para localStorage
         loadPostsLocal();
     });
 }
@@ -174,6 +173,7 @@ function renderCalendar() {
     }
 }
 
+// FUNÇÃO CORRIGIDA: Detecta posts existentes e habilita edição no clique
 function createDayElement(day, isOtherMonth, year, month) {
     const dayEl = document.createElement('div');
     dayEl.className = 'calendar-day';
@@ -188,18 +188,26 @@ function createDayElement(day, isOtherMonth, year, month) {
             dayEl.classList.add('today');
         }
         
+        // Verifica se existe post para esta data
         const dayPosts = posts.filter(p => p.date === dateStr);
         if (dayPosts.length > 0) {
             dayEl.classList.add('has-post');
+            
+            // Se algum post daquela data estiver como publicado
             if (dayPosts.some(p => p.isPosted)) {
                 dayEl.classList.add('posted');
             }
+            
             const indicator = document.createElement('div');
             indicator.className = 'post-indicator';
             dayEl.appendChild(indicator);
+            
+            // Se clicar e já tiver post, abre para EDITAR o primeiro post encontrado
+            dayEl.addEventListener('click', () => editPost(dayPosts[0].id));
+        } else {
+            // Se não tiver post, abre para CRIAR novo na data clicada
+            dayEl.addEventListener('click', () => openModalForDate(dateStr));
         }
-        
-        dayEl.addEventListener('click', () => openModalForDate(dateStr));
     }
     
     const dayNumber = document.createElement('div');
@@ -372,9 +380,11 @@ function updateStats() {
     }).length;
     
     const today = new Date();
+    today.setHours(0,0,0,0); // Ajuste para comparar apenas a data
+    
     const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
     const upcoming = posts.filter(p => {
-        const postDate = new Date(p.date);
+        const postDate = new Date(p.date + 'T00:00:00');
         return !p.isPosted && postDate >= today && postDate <= nextWeek;
     }).length;
     
@@ -410,7 +420,6 @@ function scheduleReminder(post) {
 }
 
 function checkReminders() {
-    const today = new Date().toISOString().split('T')[0];
     const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
     
     posts.forEach(post => {
